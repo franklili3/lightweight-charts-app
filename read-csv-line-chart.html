@@ -41,10 +41,12 @@
         })
         */
         // Note: You will need to include the PapaParse library in your HTML file for this code to work.
+        //let BitcoinMarketCapLogSeriesData = new Array()
+        //let ResidualSeriesData = new Array()
         let BitcoinMarketCapLogSeriesData = new Array()
         let ResidualSeriesData = new Array()
-        fetch("http://127.0.0.1:8080/bitcoin-marketcap-residual-week.csv") // https://lilibtc.com/wp-content/uploads/2023/04/1681120515-9f5e7a7288076bb.csv
-            .then(response => response.text()) // Get the text from the response
+        let res = fetch("http://127.0.0.1:8080/bitcoin-marketcap-residual-week.csv") // https://lilibtc.com/wp-content/uploads/2023/04/1681120515-9f5e7a7288076bb.csv
+        res.then(response => response.text()) // Get the text from the response
             .then(csvText => Papa.parse(csvText, {
                 header: true
             })) // Parse the text into JSON with headers
@@ -62,9 +64,10 @@
                     value: item.Residual
                 }));
                 })
-            //.catch(error => console.error(error)); // Handle any errors that occur during the process
+            .catch(error => console.error(error)); // Handle any errors that occur during the process
+        
+        
         console.log(BitcoinMarketCapLogSeriesData)
-
         // Function to generate a sample set of Area datapoints
         // Create the Lightweight Chart within the container element
         const chart = LightweightCharts.createChart(
