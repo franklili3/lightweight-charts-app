@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -9,11 +10,20 @@
     <title>Lightweight Charts™ Customization Tutorial</title>
     <!-- Adding the standalone version of Lightweight charts -->
    
+
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0" />
+    <title>Lightweight Charts™ Tutorial</title>
+    <!-- Adding the standalone version of Lightweight charts -->
+
     <script
       type="text/javascript"
       src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
   
 
     <style>
@@ -34,14 +44,15 @@
     <script type="text/javascript">
         import { createChart } from 'lightweight-charts';
 
-        // We will use the Fetch API to get the CSV file and PapaParse library to parse it into JSON
-        /*
-        fetch('https://cors-anywhere.herokuapp.com/http://lilibtc.com/wp-content/uploads/2023/04/1681120515-9f5e7a7288076bb.csv', {
-          headers: {
-            'Origin': 'https://lilibtc.com' // Replace with your website's domain
-          }
-        })
-        */
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            /* Add a background color to match the chart */
+            /*background-color:#222;*/
+        }
+    </style>
+
       // Note: You will need to include the PapaParse library in your HTML file for this code to work.
       fetch("http://127.0.0.1:8080/WebServer/bitcoin-marketcap-residual-week.csv")// https://lilibtc.com/wp-content/uploads/2023/04/1681120515-9f5e7a7288076bb.csv
         .then(response => response.text()) // Get the text from the response
@@ -261,3 +272,210 @@
     </script>
   </body>
 </html>
+<!--
+        // Note: You will need to include the PapaParse library in your HTML file for this code to work.
+        //let BitcoinMarketCapLogSeriesData = new Array()
+        //let ResidualSeriesData = new Array()
+        let BitcoinMarketCapLogSeriesData = new Array()
+        let ResidualSeriesData = new Array()
+        let res = fetch("http://127.0.0.1:8080/bitcoin-marketcap-residual-week.csv") // https://lilibtc.com/wp-content/uploads/2023/04/1681120515-9f5e7a7288076bb.csv
+        res.then(response => response.text()) // Get the text from the response
+            .then(csvText => Papa.parse(csvText, {
+                header: true
+            })) // Parse the text into JSON with headers
+            .then(jsonData => {
+                // Use the jsonData here
+                // 读出jsonData，并组合成"Bitcoin-MarketCap-Log"和"Residual"Series数据
+                // Use the map function to create two new arrays, one for Bitcoin-MarketCap-Log-SeriesData and one for Residual-SeriesData
+                BitcoinMarketCapLogSeriesData = jsonData.data.map(item => ({
+                    time: item.time,
+                    value: item['Bitcoin-MarketCap-Log']
+                }));
+                //console.log(BitcoinMarketCapLogSeriesData)
+                ResidualSeriesData = jsonData.data.map(item => ({
+                    time: item.time,
+                    value: item.Residual
+                }));
+                })
+            .catch(error => console.error(error)); // Handle any errors that occur during the process
+        
+        
+        console.log(BitcoinMarketCapLogSeriesData)
+        // Function to generate a sample set of Area datapoints
+        // Create the Lightweight Chart within the container element
+        const chart = LightweightCharts.createChart(
+            document.getElementById('container'), {
+                layout: {
+                    background: {
+                        color: 'white'
+                    },
+                    textColor: 'black', //#DDD
+                },
+                grid: {
+                    vertLines: {
+                        color: '#444'
+                    },
+                    horzLines: {
+                        color: '#444'
+                    },
+                },
+                height: 400,
+                width: 700,
+            }
+        );
+        // Generate sample data to use within a candlestick series
+         // Add an area series to the chart,
+        // Adding this before we add the candlestick chart
+        // so that it will appear beneath the candlesticks
+        const BitcoinMarketCapLogSeries = chart.addAreaSeries({
+            lastValueVisible: true, // hide the last value marker for this series
+            crosshairMarkerVisible: true, // hide the crosshair marker for this series
+            lineColor: '#DDD', // hide the line
+            topColor: 'rgba(56, 33, 110,0.6)',
+            bottomColor: 'rgba(56, 33, 110, 0.1)',
+            title: '比特币市值对数'
+        });
+         // Set the data for the Area Series
+        BitcoinMarketCapLogSeries.setData(BitcoinMarketCapLogSeriesData);
+        const ResidualSeries = chart.addAreaSeries({
+            lastValueVisible: true, // hide the last value marker for this series
+            crosshairMarkerVisible: true, // hide the crosshair marker for this series
+            lineColor: '#DDD', // hide the line
+            topColor: 'rgba(56, 33, 110,0.6)',
+            bottomColor: 'rgba(56, 33, 110, 0.1)',
+            title: '误差值'
+        });
+        // Set the data for the Area Series
+        ResidualSeries.setData(ResidualSeriesData);
+        //chart.priceScale().applyOptions({
+        //    borderColor: '#71649C',
+        //});
+
+        // Setting the border color for the horizontal axis
+        chart.timeScale().applyOptions({
+            borderColor: '#71649C',
+            barSpacing: 10,
+        });
+        chart.timeScale().fitContent();
+        // Adding a window resize event handler to resize the chart when
+        // the window size changes.
+        // Note: for more advanced examples (when the chart doesn't fill the entire window)
+        // you may need to use ResizeObserver -> https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+        //window.addEventListener("resize", () => {
+        //  chart.resize(window.innerWidth, window.innerHeight);
+        //});
+
+        // Customizing the Crosshair
+        chart.applyOptions({
+            crosshair: {
+                // Change mode from default 'magnet' to 'normal'.
+                // Allows the crosshair to move freely without snapping to datapoints
+                mode: LightweightCharts.CrosshairMode.Normal,
+
+                // Vertical crosshair line (showing Date in Label)
+                vertLine: {
+                    width: 8,
+                    color: '#C3BCDB44',
+                    style: LightweightCharts.LineStyle.Solid,
+                    labelBackgroundColor: '#9B7DFF',
+                },
+
+                // Horizontal crosshair line (showing Price in Label)
+                horzLine: {
+                    color: '#9B7DFF',
+                    labelBackgroundColor: '#9B7DFF',
+                },
+            },
+        });
+
+        // Adjust the options for the priceScale of the mainSeries
+        BitcoinMarketCapLogSeries.priceScale().applyOptions({
+            autoScale: true, // disables auto scaling based on visible content
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.2,
+            },
+        });
+        // Adjust the options for the priceScale of the mainSeries
+        ResidualSeries.priceScale().applyOptions({
+            autoScale: true, // disables auto scaling based on visible content
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.2,
+            },
+        });
+        // add price line
+        const myPriceLine1 = {
+            price: -0.85,
+            color: '#3179F5',
+            lineWidth: 2,
+            lineStyle: 2, // LineStyle.Dashed
+            axisLabelVisible: true,
+            title: '买入提示',
+        };
+        ResidualSeries.createPriceLine(myPriceLine1);
+        const myPriceLine2 = {
+            price: 1,
+            color: 'red',
+            lineWidth: 2,
+            lineStyle: 2, // LineStyle.Dashed
+            axisLabelVisible: true,
+            title: '卖出提示',
+        };
+        ResidualSeries.createPriceLine(myPriceLine2);
+
+
+        // add legend
+        const symbolName = '比特币市值对数 ';
+
+        const container = document.getElementById('container');
+
+        const legend = document.createElement('div');
+        legend.style = "position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300";
+        container.appendChild(legend);
+
+        const firstRow = document.createElement('div');
+        firstRow.innerHTML = symbolName;
+        firstRow.style.color = 'black';
+        legend.appendChild(firstRow);
+
+
+
+        chart.subscribeCrosshairMove(param => {
+            let priceFormatted = '';
+            if (param.time) {
+                const dateStr = param.time;
+                const data = param.seriesData.get(BitcoinMarketCapLogSeries);
+                const price = data.value !== undefined ? data.value : data.close;
+                priceFormatted = price.toFixed(2);
+                toolTip.style.display = 'block';
+                toolTip.innerHTML = `<div>${priceFormatted}</div>
+              <div>${dateStr}</div>`;
+                // Position tooltip according to mouse cursor position
+                toolTip.style.left = param.point.x - 50 + 'px';
+                toolTip.style.top = param.point.y - 50 + 'px';
+
+            }
+            firstRow.innerHTML = `${symbolName} <strong>`;
+            /*
+            ${priceFormatted}</strong>`;
+            if (
+                param.point === undefined ||
+                !param.time ||
+                param.point.x < 0 ||
+                param.point.y < 0
+            ) {
+                toolTip.style.display = 'none';
+            } else {
+                const dateStr = dateToString(param.time);
+                const data = param.seriesData.get(mainSeries);
+                const price = data.value !== undefined ? data.value : data.close;
+
+            }
+            */
+        });
+    </script>
+</body>
+
+</html>
+-->
