@@ -2,11 +2,11 @@ var http=require('http');
 var fs = require('fs');
 var url = require('url');
 
-//创建服务器
+// create server
 http.createServer(function(request,response) {
-  //解析请求，包括文件名
+  // parse request, including file name
   var pathname= url.parse(request.url).pathname;
-  //输出请求的文件名
+  // output the file name requesting
   console.log("Request for "+ pathname + "  received.");
 
   var firstDir = pathname && pathname.split('/')[1];
@@ -20,23 +20,23 @@ http.createServer(function(request,response) {
     ContentType = {'Content-Type': 'application/x-javascript'}
   }
 
-  //从文件系统中去请求的文件内容
+  // read content from files
   fs.readFile(pathname.substr(1),function(err, data) {
     if(err) {
       console.log(err);
-      //HTTP 状态码 404 ： NOT FOUND
+      //HTTP status 404 ： NOT FOUND
       //Content Type:text/plain
       response.writeHead(404, {'Content-Type': 'text/html'});
     }
     else {
-      //HTTP 状态码 200 ： OK
+      //HTTP status 200 ： OK
       //Content Type:text/plain
       response.writeHead(200, ContentType);
 
-      //写会回相应内容
+      // write back the response
       response.write(data.toString());
     }
-    //发送响应数据
+    // send response data
     response.end();
   });
 }).listen(8080);
